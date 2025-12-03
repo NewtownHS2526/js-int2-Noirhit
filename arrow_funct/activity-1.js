@@ -4,7 +4,7 @@ function greet(name) {
     return "Hello, " + name + "!";
 }
 const greet2 = (name)=> "Name " + name + " hi!";
-console.log(greet2("tenzing"));
+console.log(greet2("Noirhit"));
 
 // Your task:
 // 1. Convert the above function to an arrow function (one-liner with implicit return)
