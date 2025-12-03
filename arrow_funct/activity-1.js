@@ -12,11 +12,11 @@ console.log(greet2("tenzing"));
 const greetMultiLine = (name) => {
     return "Hello, " + name + "!";
 };
-console.log(greetMultiLine("Tenzing"));
+console.log(greetMultiLine("Noirhit"));
 
 // 3. Write it without parentheses for the single parameter
 const greetNo = name => "Hello, " + name + "!";
-console.log(greetNo("Tenzing"));
+console.log(greetNo("Noirhit"));
 
 // ============================================================================
 // Problem 2: Arrow Function with Multiple Parameters
