@@ -1,90 +1,123 @@
 /*
  * ACTIVITY 1: Primitive Data Types
- * 
- * Problem 1: Number Type
- * Work with numbers and understand numeric operations
  */
 
-const num1 = 10;
-const num2 = 3.14;
-const num3 = -5;
-const num4 = 1e6; // Scientific notation
+// ============================================================================
+// Problem 1: Number Type
+// ============================================================================
 
-// Your task:
-// 1. Log the type of each number using typeof operator
-// 2. Perform arithmetic: addition, subtraction, multiplication, division, modulo
-// 3. Understand special numbers:
-//    - What is typeof Infinity?
-//    - What is typeof NaN?
-//    - Test: 0 / 0, 1 / 0, -1 / 0
-//
-// 4. Challenge: Create a function 'numberInfo' that:
-//    - Takes a number
-//    - Returns object with: {type, isInteger, isPositive, isFinite, value}
-//    - Handles edge cases (NaN, Infinity)
+console.log(typeof num1); // "number"
+console.log(typeof num2); // "number"
+console.log(typeof num3); // "number"
+console.log(typeof num4); // "number"
+
+// Arithmetic
+console.log(num1 + num2); // addition
+console.log(num1 - num3); // subtraction
+console.log(num2 * num3); // multiplication
+console.log(num1 / num2); // division
+console.log(num1 % num2); // modulo
+
+// Special numbers
+console.log(typeof Infinity); // "number"
+console.log(typeof NaN);      // "number"
+console.log(0 / 0);           // NaN
+console.log(1 / 0);           // Infinity
+console.log(-1 / 0);          // -Infinity
+
+function numberInfo(n) {
+    return {
+        type: typeof n,
+        isInteger: Number.isInteger(n),
+        isPositive: typeof n === "number" && n > 0,
+        isFinite: Number.isFinite(n),
+        value: n
+    };
+}
+
+// Example:
+console.log(numberInfo(NaN));
+console.log(numberInfo(Infinity));
+console.log(numberInfo(-10));
 
 // ============================================================================
 // Problem 2: String Type
-// Work with strings and string operations
 // ============================================================================
 
-const str1 = "Hello";
-const str2 = 'World';
-const str3 = `Template`;
+console.log(typeof str1); // "string"
+console.log(typeof str2); // "string"
+console.log(typeof str3); // "string"
 
-// Your task:
-// 1. Log the type of each string
-// 2. Concatenate strings: str1 + " " + str2
-// 3. Use template literals: `${str1} ${str2}!`
-// 4. Access string length: str1.length
-// 5. Access characters: str1[0], str1.charAt(0)
-//
-// 6. Challenge: Create a function 'stringAnalyzer' that:
-//    - Takes a string
-//    - Returns object with: {length, firstChar, lastChar, isEmpty, type}
-//    - Handle empty strings and edge cases
+// Concatenation
+console.log(str1 + " " + str2);
+console.log(`${str1} ${str2}!`);
+console.log(str1.length);
+console.log(str1[0], str1.charAt(0));
+
+function stringAnalyzer(s) {
+    return {
+        length: s.length,
+        firstChar: s.charAt(0) || null,
+        lastChar: s.charAt(s.length - 1) || null,
+        isEmpty: s.length === 0,
+        type: typeof s
+    };
+}
+
+// Example:
+console.log(stringAnalyzer("Hello"));
+console.log(stringAnalyzer(""));
 
 // ============================================================================
 // Problem 3: Boolean Type
-// Work with boolean values and logical operations
 // ============================================================================
 
-const bool1 = true;
-const bool2 = false;
-const truthy1 = 1;
-const falsy1 = 0;
+console.log(typeof bool1); // "boolean"
+console.log(typeof bool2); // "boolean"
 
-// Your task:
-// 1. Log the type of bool1 and bool2
-// 2. Understand truthy/falsy values:
-//    - Test: Boolean(0), Boolean(""), Boolean(null), Boolean(undefined)
-//    - Test: !!0, !!"", !!null
-// 3. Use logical operators: &&, ||, !
-//
-// 4. Challenge: Create a function 'isTruthy' that:
-//    - Takes any value
-//    - Returns true if value is truthy, false if falsy
-//    - Test with various data types
+// Truthy/falsy
+console.log(Boolean(0), Boolean(""), Boolean(null), Boolean(undefined));
+console.log(!!0, !!"", !!null);
+
+// Logical operators
+console.log(true && false); // false
+console.log(true || false); // true
+console.log(!true);         // false
+
+function isTruthy(value) {
+    return !!value;
+}
+
+// Example:
+console.log(isTruthy(0)); // false
+console.log(isTruthy("text")); // true
+console.log(isTruthy(null)); // false
+console.log(isTruthy([])); // true
 
 // ============================================================================
 // Problem 4: Undefined and Null
-// Understand the difference between undefined and null
 // ============================================================================
 
-let undefVar;
-const nullVar = null;
+console.log(typeof undefVar); // "undefined"
+console.log(typeof nullVar);  // "object" (quirk of JS)
 
-// Your task:
-// 1. Check types: typeof undefVar, typeof nullVar
-// 2. Understand when variables are undefined vs null
-// 3. Test comparisons:
-//    - undefined == null
-//    - undefined === null
-//    - undefVar === undefined
-//    - nullVar === null
-//
-// 4. Challenge: Create a function 'checkValue' that:
-//    - Takes any value
-//    - Returns: "undefined", "null", "empty string", "zero", or "has value"
-//    - Handles all edge cases appropriately
+// Comparisons
+console.log(undefined == null);  // true
+console.log(undefined === null); // false
+console.log(undefVar === undefined); // true
+console.log(nullVar === null);       // true
 
+function checkValue(val) {
+    if (val === undefined) return "undefined";
+    if (val === null) return "null";
+    if (val === "") return "empty string";
+    if (val === 0) return "zero";
+    return "has value";
+}
+
+// Examples:
+console.log(checkValue(undefined)); // "undefined"
+console.log(checkValue(null));      // "null"
+console.log(checkValue(""));        // "empty string"
+console.log(checkValue(0));         // "zero"
+console.log(checkValue("Hello"));   // "has value"

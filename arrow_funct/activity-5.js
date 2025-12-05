@@ -5,59 +5,109 @@
  * Create arrow functions with default parameter values
  */
 
-// Your task:
 // 1. Create an arrow function 'greet' with default name parameter ("Guest")
-// 2. Create an arrow function 'calculatePrice' with default tax (0.1) and discount (0) parameters
+const greet = (name = "Guest") => `Hello, ${name}!`;
+
+// 2. Create an arrow function 'calculatePrice' with default tax (0.1) and discount (0)
+const calculatePrice = (price, tax = 0.1, discount = 0) => price + price * tax - discount;
+
 // 3. Create an arrow function 'formatDate' with default format parameter ("YYYY-MM-DD")
+const formatDate = (date, format = "YYYY-MM-DD") => {
+    const d = new Date(date);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return format.replace("YYYY", y).replace("MM", m).replace("DD", day);
+};
+
 // 4. Test each function with and without parameters
+greet();
+greet("Alex");
+calculatePrice(100);
+calculatePrice(100, 0.2, 5);
+formatDate("2025-05-15");
+formatDate("2025-05-15", "MM/DD/YYYY");
 
 // ============================================================================
 // Problem 2: Arrow Functions with Rest Parameters
 // Use arrow functions with rest parameters to handle variable arguments
 // ============================================================================
 
-// Your task:
 // 1. Create an arrow function 'sumAll' that takes any number of arguments and returns their sum
-//    Example: sumAll(1, 2, 3, 4, 5) should return 15
-//
-// 2. Create an arrow function 'findMax' that finds the maximum value from any number of arguments
-//
-// 3. Create an arrow function 'combineStrings' that combines any number of strings with a separator
-//    Example: combineStrings("-", "a", "b", "c") should return "a-b-c"
-//
-// 4. Challenge: Create a function 'createLogger' that returns an arrow function accepting 
-//    any number of arguments and logs them with a timestamp prefix
+const sumAll = (...nums) => nums.reduce((a, b) => a + b, 0);
+
+// 2. Create an arrow function 'findMax' that finds the maximum value
+const findMax = (...nums) => Math.max(...nums);
+
+// 3. Create an arrow function 'combineStrings'
+const combineStrings = (sep, ...strings) => strings.join(sep);
+
+// 4. Challenge: createLogger
+const createLogger = () => (...args) =>
+    console.log(`[${new Date().toISOString()}]`, ...args);
 
 // ============================================================================
 // Problem 3: Currying with Arrow Functions
 // Implement function currying using arrow functions
 // ============================================================================
 
-// Your task:
-// 1. Create a curried arrow function 'add' where add(5)(10) returns 15
-// 2. Create a curried arrow function 'multiply' where multiply(2)(3)(4) returns 24
-// 3. Challenge: Create a generic 'curry' function that takes any function and curries it
-//    Example: const curriedAdd = curry((a, b, c) => a + b + c);
-//             curriedAdd(1)(2)(3) should return 6
+// 1. Curried add
+const add = a => b => a + b;
+
+// 2. Curried multiply
+const multiply = a => b => c => a * b * c;
+
+// 3. Generic curry function
+const curry = fn => {
+    const curried = (...args) =>
+        args.length >= fn.length
+            ? fn(...args)
+            : (...next) => curried(...args, ...next);
+    return curried;
+};
 
 // ============================================================================
 // Problem 4: Arrow Functions with Closures
 // Use arrow functions to create closures that maintain state
 // ============================================================================
 
-// Your task:
-// 1. Create a function 'createCounter' that returns an object with arrow function methods:
-//    - increment() - increases counter by 1
-//    - decrement() - decreases counter by 1
-//    - getValue() - returns current counter value
-//    - reset() - resets counter to 0
-//
-// 2. Create a function 'createBankAccount' with arrow function methods:
-//    - deposit(amount) - adds to balance
-//    - withdraw(amount) - subtracts from balance (can't go below 0)
-//    - getBalance() - returns current balance
-//    The balance should be private and only accessible through these methods
-//
-// 3. Challenge: Create a 'createGameScore' that tracks multiple players' scores using closures
-//    Methods: addScore(player, points), getScore(player), getLeader()
+// 1. createCounter
+const createCounter = () => {
+    let value = 0;
+    return {
+        increment: () => value++,
+        decrement: () => value--,
+        getValue: () => value,
+        reset: () => value = 0
+    };
+};
 
+// 2. createBankAccount
+const createBankAccount = () => {
+    let balance = 0;
+    return {
+        deposit: amount => balance += amount,
+        withdraw: amount => balance = Math.max(0, balance - amount),
+        getBalance: () => balance
+    };
+};
+
+// 3. createGameScore
+const createGameScore = () => {
+    const scores = {};
+    return {
+        addScore: (player, points) => scores[player] = (scores[player] || 0) + points,
+        getScore: player => scores[player] || 0,
+        getLeader: () => {
+            let leader = null;
+            let max = -Infinity;
+            for (const p in scores) {
+                if (scores[p] > max) {
+                    max = scores[p];
+                    leader = p;
+                }
+            }
+            return leader;
+        }
+    };
+};

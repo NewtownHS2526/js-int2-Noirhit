@@ -1,87 +1,106 @@
 /*
  * ACTIVITY 4: Special Data Types and Values
- * 
- * Problem 1: NaN (Not a Number)
- * Understand and handle NaN values
  */
 
-const result1 = 0 / 0;
-const result2 = Number("not a number");
-const result3 = Math.sqrt(-1);
+// ============================================================================
+// Problem 1: NaN (Not a Number)
+// ============================================================================
 
-// Your task:
-// 1. Check what typeof NaN returns
-// 2. Test: NaN === NaN (what does this return? why?)
-// 3. Test: isNaN(NaN), isNaN("text"), isNaN(123)
-// 4. Use Number.isNaN() for more accurate checking
-//
-// 5. Challenge: Create a function 'safeDivide' that:
-//    - Takes two numbers
-//    - Returns result of division
-//    - Returns null if result is NaN or Infinity
-//    - Handles division by zero
+// typeof NaN
+console.log(typeof NaN); // "number"
+
+// NaN comparisons
+console.log(NaN === NaN); // false — NaN is never equal to itself
+
+// isNaN tests
+console.log(isNaN(NaN));       // true
+console.log(isNaN("text"));    // true (coerces to number, fails)
+console.log(isNaN(123));       // false
+
+// Number.isNaN is more accurate
+console.log(Number.isNaN(NaN));       // true
+console.log(Number.isNaN("text"));    // false
+
+// Challenge: safeDivide
+function safeDivide(a, b) {
+    const result = a / b;
+    if (!Number.isFinite(result)) return null; // handles NaN and Infinity
+    return result;
+}
+
+console.log(safeDivide(10, 2));  // 5
+console.log(safeDivide(0, 0));   // null
+console.log(safeDivide(1, 0));   // null
 
 // ============================================================================
 // Problem 2: Infinity
-// Understand Infinity values
 // ============================================================================
 
-const posInf = Infinity;
-const negInf = -Infinity;
-const largeNum = 1e308 * 2;
+console.log(typeof Infinity); // "number"
 
-// Your task:
-// 1. Check typeof Infinity
-// 2. Test comparisons:
-//    - Infinity > 1000
-//    - -Infinity < -1000
-//    - Infinity === Infinity
-//
-// 3. Test: Number.isFinite(Infinity), Number.isFinite(123)
-//
-// 4. Challenge: Create a function 'safeNumber' that:
-//    - Takes any value
-//    - Returns true if it's a finite number
-//    - Returns false for NaN, Infinity, -Infinity, or non-numbers
+// Comparisons
+console.log(Infinity > 1000);    // true
+console.log(-Infinity < -1000);  // true
+console.log(Infinity === Infinity); // true
+
+// Number.isFinite
+console.log(Number.isFinite(Infinity)); // false
+console.log(Number.isFinite(123));      // true
+
+// Challenge: safeNumber
+function safeNumber(value) {
+    return typeof value === "number" && Number.isFinite(value);
+}
+
+console.log(safeNumber(123));       // true
+console.log(safeNumber(Infinity));  // false
+console.log(safeNumber(NaN));       // false
+console.log(safeNumber("123"));     // false
 
 // ============================================================================
 // Problem 3: Symbol Type
-// Understand Symbol data type
 // ============================================================================
 
-const sym1 = Symbol("description");
-const sym2 = Symbol("description");
+console.log(typeof sym1);      // "symbol"
+console.log(sym1 === sym2);    // false — each Symbol is unique
 
-// Your task:
-// 1. Check typeof sym1
-// 2. Test: sym1 === sym2 (are they equal? why not?)
-// 3. Create symbol property:
-//    const obj = {};
-//    obj[sym1] = "value";
-//
-// 4. Challenge: Create a function 'createUniqueKey' that:
-//    - Takes a description
-//    - Returns a unique Symbol
-//    - Use it to create private properties in an object
+// Symbol property
+const obj = {};
+obj[sym1] = "value";
+console.log(obj[sym1]);        // "value"
+
+// Challenge: createUniqueKey
+function createUniqueKey(desc) {
+    return Symbol(desc);
+}
+
+const privateKey = createUniqueKey("secret");
+const myObj = {};
+myObj[privateKey] = 42;
+console.log(myObj[privateKey]); // 42
 
 // ============================================================================
 // Problem 4: BigInt Type
-// Work with large integers
 // ============================================================================
 
-const bigNum1 = BigInt(123);
-const bigNum2 = 456n; // BigInt literal
+console.log(typeof bigNum1); // "bigint"
 
-// Your task:
-// 1. Check typeof bigNum1
-// 2. Perform operations: bigNum1 + bigNum2, bigNum1 * 2n
-// 3. Understand limitations:
-//    - Can't mix BigInt with regular numbers
-//    - Test: bigNum1 + 5 (what error do you get?)
-//
-// 4. Challenge: Create a function 'safeBigInt' that:
-//    - Takes a number or string
-//    - Converts to BigInt safely
-//    - Handles invalid inputs gracefully
-//    - Returns null if conversion fails
+// Operations
+console.log(bigNum1 + bigNum2); // 579n
+console.log(bigNum1 * 2n);      // 246n
 
+// Mixing BigInt and Number causes error
+// console.log(bigNum1 + 5); // TypeError
+
+// Challenge: safeBigInt
+function safeBigInt(input) {
+    try {
+        return BigInt(input);
+    } catch {
+        return null;
+    }
+}
+
+console.log(safeBigInt("123"));  // 123n
+console.log(safeBigInt(456));    // 456n
+console.log(safeBigInt("abc"));  // null

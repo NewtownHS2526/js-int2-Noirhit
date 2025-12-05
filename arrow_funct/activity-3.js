@@ -132,5 +132,5 @@ const resultPipe = pipe(increment, double, square)(5);
 
 const resultCompose = compose(increment, double, square)(5);
 
-console.log("Pipe result:", resultPipe);       // 144
-console.log("Compose result:", resultCompose); // 51
+console.log("Pipe result:", resultPipe);       
+console.log("Compose result:", resultCompose); 

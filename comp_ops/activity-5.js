@@ -11,16 +11,43 @@ const result3 = parseInt("not a number"); // NaN
 
 // Your task:
 // 1. Test: result1 === NaN (what happens?)
+console.log(result1 === NaN); // false
+
 // 2. Test: result1 == NaN (what happens?)
+console.log(result1 == NaN); // false
+
 // 3. Find the correct way to check if a value is NaN
-// 4. Create a function 'isValidNumber' that:
-//    - Returns true if value is a valid number
-//    - Returns false for NaN, Infinity, or non-numbers
-//
-// 5. Challenge: Write a 'safeCalculation' function that:
-//    - Takes two numbers and an operation (+, -, *, /)
-//    - Performs calculation with comparison checks
-//    - Returns null if result is NaN or Infinity
+console.log(Number.isNaN(result1)); // true
+
+// 4. Create a function 'isValidNumber'
+const isValidNumber = (value) =>
+    typeof value === "number" &&
+    !Number.isNaN(value) &&
+    Number.isFinite(value);
+
+// 5. Challenge: Write a 'safeCalculation' function
+const safeCalculation = (a, b, op) => {
+    let result;
+
+    switch (op) {
+        case "+":
+            result = a + b;
+            break;
+        case "-":
+            result = a - b;
+            break;
+        case "*":
+            result = a * b;
+            break;
+        case "/":
+            result = b === 0 ? NaN : a / b;
+            break;
+        default:
+            return null;
+    }
+
+    return isValidNumber(result) ? result : null;
+};
 
 // ============================================================================
 // Problem 2: Infinity Comparisons
@@ -33,20 +60,32 @@ const largeNum = 1e308 * 2;
 
 // Your task:
 // 1. Compare: positiveInf > 1000
+console.log(positiveInf > 1000); // true
+
 // 2. Compare: negativeInf < -1000
+console.log(negativeInf < -1000); // true
+
 // 3. Compare: positiveInf === Infinity
+console.log(positiveInf === Infinity); // true
+
 // 4. Compare: largeNum (what is it? Is it Infinity?)
-//
-// 5. Challenge: Create a function 'isFiniteNumber' that:
-//    - Checks if a number is finite (not Infinity, not NaN)
-//    - Use comparisons and logical operators
-//
-// 6. Challenge: Create a 'clamp' function that:
-//    - Takes a value, min, and max
-//    - Returns value if in range
-//    - Returns min if value < min
-//    - Returns max if value > max
-//    - Handles Infinity cases
+console.log(largeNum); // Infinity
+console.log(largeNum === Infinity); // true
+
+// 5. Challenge: Create 'isFiniteNumber'
+const isFiniteNumber = (value) =>
+    typeof value === "number" &&
+    !Number.isNaN(value) &&
+    value !== Infinity &&
+    value !== -Infinity;
+
+// 6. Challenge: Create 'clamp' function
+const clamp = (value, min, max) => {
+    if (!isFiniteNumber(value)) return min;
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+};
 
 // ============================================================================
 // Problem 3: Date Comparisons
@@ -58,18 +97,37 @@ const date2 = new Date("2024-02-15");
 const date3 = new Date("2024-01-15");
 
 // Your task:
-// 1. Compare: date1 < date2 (earlier date is "less")
+// 1. Compare: date1 < date2
+console.log(date1 < date2); // true
+
 // 2. Compare: date1 === date3 (what happens? why?)
+console.log(date1 === date3); // false (different objects)
+
 // 3. How do you properly compare if two dates are the same?
-// 4. Create checks for:
-//    - If date is in the past
-//    - If date is in the future
-//    - If date is today
-//
-// 5. Challenge: Create a 'compareDates' function that:
-//    - Takes two dates
-//    - Returns -1 if first is earlier, 0 if equal, 1 if later
-//    - Uses proper date comparisons
+console.log(date1.getTime() === date3.getTime()); // true
+
+// 4. Create checks:
+const now = new Date();
+
+const isPast = (d) => d.getTime() < now.getTime();
+const isFuture = (d) => d.getTime() > now.getTime();
+const isToday = (d) => {
+    const today = new Date();
+    return (
+        d.getFullYear() === today.getFullYear() &&
+        d.getMonth() === today.getMonth() &&
+        d.getDate() === today.getDate()
+    );
+};
+
+// 5. Challenge: 'compareDates'
+const compareDates = (a, b) => {
+    const t1 = a.getTime();
+    const t2 = b.getTime();
+    if (t1 < t2) return -1;
+    if (t1 > t2) return 1;
+    return 0;
+};
 
 // ============================================================================
 // Problem 4: Complex Real-World Comparison Problem
@@ -86,19 +144,51 @@ const event = {
 };
 
 // Your task:
-// Create a function 'checkEventStatus' that evaluates:
-// 1. If event is in the past (date < today)
-// 2. If event is full (registered >= capacity)
-// 3. If event is almost full (registered >= capacity * 0.9)
-// 4. If event is expensive (price > 100)
-// 5. If event is cancelled
 //
-// Challenge: Return an object with status and recommendations:
-// {
-//   status: "available" | "full" | "past" | "cancelled",
-//   canRegister: boolean,
-//   urgency: "low" | "medium" | "high",
-//   recommendation: string
-// }
-// Use multiple comparison operators and logical combinations
+// Challenge: Create 'checkEventStatus'
+const checkEventStatus = (event) => {
+    const today = new Date();
 
+    const past = event.date < today;
+    const full = event.registered >= event.capacity;
+    const almostFull = event.registered >= event.capacity * 0.9;
+    const expensive = event.price > 100;
+    const cancelled = event.isCancelled;
+
+    let status = "available";
+    let canRegister = true;
+    let urgency = "low";
+    let recommendation = "You can register normally.";
+
+    if (cancelled) {
+        status = "cancelled";
+        canRegister = false;
+        urgency = "low";
+        recommendation = "Event is cancelled.";
+    } else if (past) {
+        status = "past";
+        canRegister = false;
+        urgency = "low";
+        recommendation = "Event already happened.";
+    } else if (full) {
+        status = "full";
+        canRegister = false;
+        urgency = "high";
+        recommendation = "No seats left.";
+    } else if (almostFull) {
+        status = "available";
+        canRegister = true;
+        urgency = "high";
+        recommendation = "Hurry — seats almost gone!";
+    } else if (expensive) {
+        urgency = "medium";
+        recommendation = "Price is high, consider your budget.";
+    }
+
+    return {
+        status,
+        canRegister,
+        urgency,
+        recommendation
+    };
+};

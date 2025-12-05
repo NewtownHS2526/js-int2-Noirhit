@@ -1,125 +1,141 @@
 /*
  * ACTIVITY 6: Conditional Statements - Integration Challenge
- * 
- * Problem 1: Building a Decision Tree
- * Create a complex decision-making system
  */
 
-const user = {
-    age: 25,
-    isMember: true,
-    purchaseAmount: 150,
-    hasCoupon: true
-};
+// ============================================================================
+// Problem 1: Building a Decision Tree
+// ============================================================================
 
-// Your task:
-// Create a function 'calculateFinalPrice' that:
-// 1. Base price: purchaseAmount
-// 2. Age discount: 10% if age >= 65
-// 3. Member discount: 5% if isMember
-// 4. Coupon discount: 15% if hasCoupon
-// 5. Large purchase discount: 10% if purchaseAmount > 200
-// 6. Rules:
-//    - Only one discount can apply (highest one)
-//    - Except: member discount stacks with one other discount
-//    - Minimum price: $10
-//
-// Challenge: Return detailed breakdown: {original, discounts, final, savings}
+function calculateFinalPrice(user) {
+    const { age, isMember, purchaseAmount, hasCoupon } = user;
+    const discounts = [];
+
+    let highestDiscount = 0;
+
+    // Determine highest single discount
+    const ageDiscount = age >= 65 ? 0.10 : 0;
+    const couponDiscount = hasCoupon ? 0.15 : 0;
+    const largePurchaseDiscount = purchaseAmount > 200 ? 0.10 : 0;
+
+    highestDiscount = Math.max(ageDiscount, couponDiscount, largePurchaseDiscount);
+
+    // Member discount always stacks with highest
+    const memberDiscount = isMember ? 0.05 : 0;
+
+    let totalDiscount = highestDiscount + memberDiscount;
+
+    const savings = purchaseAmount * totalDiscount;
+    const final = Math.max(10, purchaseAmount - savings); // minimum price $10
+
+    // Build discount breakdown
+    if (highestDiscount > 0) discounts.push({ type: "Highest Discount", percent: highestDiscount * 100 });
+    if (memberDiscount > 0) discounts.push({ type: "Member Discount", percent: memberDiscount * 100 });
+
+    return {
+        original: purchaseAmount,
+        discounts,
+        final: final.toFixed(2),
+        savings: savings.toFixed(2)
+    };
+}
+
+// Example:
+console.log(calculateFinalPrice(user));
 
 // ============================================================================
 // Problem 2: State Machine
-// Implement a simple state machine using conditionals
 // ============================================================================
 
-// Your task:
-// Create a 'TrafficLight' state machine:
-// 1. States: "red", "yellow", "green"
-// 2. Function 'changeState(currentState)' that:
-//    - red -> green
-//    - green -> yellow
-//    - yellow -> red
-//    - Returns new state
-//
-// 3. Function 'canGo(currentState)' that returns true for "green"
-//
-// 4. Challenge: Create a 'GameState' machine with states:
-//    - "menu", "playing", "paused", "gameOver"
-//    - Implement transitions between states
-//    - Validate that transitions are legal
-//    - Use switch statements for state handling
+function changeState(currentState) {
+    switch (currentState) {
+        case "red": return "green";
+        case "green": return "yellow";
+        case "yellow": return "red";
+        default: return "invalid state";
+    }
+}
+
+function canGo(currentState) {
+    return currentState === "green";
+}
+
+// Example:
+console.log(changeState("red")); // green
+console.log(canGo("green")); // true
+console.log(canGo("red")); // false
 
 // ============================================================================
 // Problem 3: Conditional-Based Routing
-// Create a routing system using conditionals
 // ============================================================================
 
-const routes = {
-    "/": "Home",
-    "/about": "About",
-    "/contact": "Contact",
-    "/products": "Products"
-};
+function getPage(path) {
+    // Remove query params
+    const cleanPath = path.split("?")[0];
+    return routes[cleanPath] || "404 - Not Found";
+}
 
-// Your task:
-// 1. Create function 'getPage(path)' that:
-//    - Takes a path string
-//    - Returns page name if route exists
-//    - Returns "404 - Not Found" if route doesn't exist
-//
-// 2. Enhance to handle query parameters:
-//    - "/products?category=electronics"
-//    - Extract and validate query parameters
-//
-// 3. Challenge: Create a 'Router' that:
-//    - Handles multiple routes with conditionals
-//    - Supports route parameters: "/user/:id"
-//    - Supports protected routes (requires authentication)
-//    - Returns appropriate response or error
+// Example:
+console.log(getPage("/")); // Home
+console.log(getPage("/products?category=electronics")); // Products
+console.log(getPage("/unknown")); // 404 - Not Found
 
 // ============================================================================
 // Problem 4: Complete Conditional System
-// Build a comprehensive system using all conditional techniques
 // ============================================================================
 
-const library = {
-    books: [
-        { title: "Book A", available: true, genre: "Fiction", rating: 4.5 },
-        { title: "Book B", available: false, genre: "Non-Fiction", rating: 4.0 },
-        { title: "Book C", available: true, genre: "Fiction", rating: 4.8 },
-        { title: "Book D", available: true, genre: "Science", rating: 3.5 }
-    ],
-    members: [
-        { id: 1, name: "Alice", type: "student", booksBorrowed: 2 },
-        { id: 2, name: "Bob", type: "faculty", booksBorrowed: 5 }
-    ]
+const LibrarySystem = {
+    findAvailableBooks: (genre, minRating = 0) => {
+        return library.books.filter(book => 
+            book.available &&
+            (!genre || book.genre === genre) &&
+            book.rating >= minRating
+        );
+    },
+
+    canBorrowBook: (memberId, bookTitle) => {
+        const member = library.members.find(m => m.id === memberId);
+        if (!member) return { canBorrow: false, reason: "Member not found" };
+
+        const book = library.books.find(b => b.title === bookTitle);
+        if (!book) return { canBorrow: false, reason: "Book not found" };
+        if (!book.available) return { canBorrow: false, reason: "Book not available" };
+
+        const limit = member.type === "student" ? 3 : 10;
+        if (member.booksBorrowed >= limit) return { canBorrow: false, reason: "Borrowing limit reached" };
+
+        return { canBorrow: true, reason: "Eligible to borrow" };
+    },
+
+    recommendBooks: (memberId) => {
+        const member = library.members.find(m => m.id === memberId);
+        if (!member) return [];
+
+        // Find genres member borrowed most (simulate with booksBorrowed as all same)
+        const preferredGenre = library.books.find(b => b.available)?.genre;
+
+        return library.books
+            .filter(b => b.available && b.genre === preferredGenre)
+            .sort((a, b) => b.rating - a.rating)
+            .slice(0, 3);
+    },
+
+    borrowBook: (memberId, bookTitle) => {
+        const canBorrowResult = LibrarySystem.canBorrowBook(memberId, bookTitle);
+        if (!canBorrowResult.canBorrow) return { success: false, message: canBorrowResult.reason };
+
+        const member = library.members.find(m => m.id === memberId);
+        const book = library.books.find(b => b.title === bookTitle);
+
+        book.available = false;
+        member.booksBorrowed += 1;
+
+        return { success: true, message: `Book "${bookTitle}" borrowed successfully by ${member.name}` };
+    }
 };
 
-// Your task:
-// Create a complete 'LibrarySystem' with functions using conditionals:
-
-// 1. 'findAvailableBooks(genre, minRating)'
-//    - Filters books by availability
-//    - Optional genre filter
-//    - Optional minimum rating filter
-//    - Returns array of matching books
-
-// 2. 'canBorrowBook(memberId, bookTitle)'
-//    - Checks if member exists
-//    - Checks if book exists and is available
-//    - Checks borrowing limits: students (3 max), faculty (10 max)
-//    - Returns {canBorrow: true/false, reason: string}
-
-// 3. 'recommendBooks(memberId)'
-//    - Gets member's preferred genre from borrowing history
-//    - Recommends available books in that genre
-//    - Prioritizes highly rated books
-//    - Returns top 3 recommendations
-
-// Challenge: Create a complete 'borrowBook' function that:
-// - Validates all conditions
-// - Updates book availability
-// - Updates member's borrowed count
-// - Returns success/error with detailed message
-// - Uses nested conditionals, guard clauses, and logical operators
-// - Handles all edge cases
-
+// Example usage:
+console.log(LibrarySystem.findAvailableBooks("Fiction", 4.5));
+console.log(LibrarySystem.canBorrowBook(1, "Book A"));
+console.log(LibrarySystem.recommendBooks(1));
+console.log(LibrarySystem.borrowBook(1, "Book C"));
+console.log(LibrarySystem.borrowBook(1, "Book C")); // Already borrowed

@@ -7,103 +7,211 @@
 
 // Your task:
 // Create a 'Validator' class/object with methods using comparison operators:
-// 1. isEmail(email) - checks email format (must contain @ and .)
-// 2. isAge(age) - checks if age is between 0 and 150
-// 3. isScore(score) - checks if score is between 0 and 100
-// 4. isStringLength(str, min, max) - checks string length range
-// 5. isPositive(num) - checks if number > 0
-// 6. isInRange(num, min, max) - checks if number is in range
+const Validator = {
+    isEmail: (email) =>
+        typeof email === "string" &&
+        email.includes("@") &&
+        email.includes("."),
 
-// Challenge: Create a 'validateForm' function that:
-// - Takes form data and validation rules
-// - Uses all comparison methods
-// - Returns detailed validation results
-// Example:
-// validateForm({
-//   email: "test@example.com",
-//   age: 25,
-//   score: 85
-// }, {
-//   email: ["isEmail"],
-//   age: ["isAge"],
-//   score: ["isScore", "isInRange", [0, 100]]
-// })
+    isAge: (age) => typeof age === "number" && age >= 0 && age <= 150,
+
+    isScore: (score) => typeof score === "number" && score >= 0 && score <= 100,
+
+    isStringLength: (str, min, max) =>
+        typeof str === "string" && str.length >= min && str.length <= max,
+
+    isPositive: (num) => typeof num === "number" && num > 0,
+
+    isInRange: (num, min, max) =>
+        typeof num === "number" && num >= min && num <= max,
+};
+
+// Challenge: validateForm
+const validateForm = (data, rules) => {
+    const errors = {};
+    let valid = true;
+
+    for (const field in rules) {
+        const checks = rules[field];
+        const value = data[field];
+        errors[field] = [];
+
+        for (const rule of checks) {
+            if (typeof rule === "string") {
+                if (!Validator[rule](value)) {
+                    errors[field].push(`${rule} failed`);
+                }
+            } else if (Array.isArray(rule)) {
+                const [min, max] = rule;
+                if (!Validator.isInRange(value, min, max)) {
+                    errors[field].push(`isInRange failed (${min}-${max})`);
+                }
+            }
+        }
+
+        if (errors[field].length > 0) valid = false;
+    }
+
+    return { valid, errors };
+};
 
 // ============================================================================
 // Problem 2: Building a Search/Filter System
 // Create a flexible filtering system
 // ============================================================================
 
-const products = [
-    { name: "Laptop", price: 999, rating: 4.5, stock: 10, category: "Electronics" },
-    { name: "Phone", price: 699, rating: 4.8, stock: 5, category: "Electronics" },
-    { name: "Book", price: 15, rating: 4.2, stock: 50, category: "Education" },
-    { name: "Chair", price: 150, rating: 4.0, stock: 20, category: "Furniture" }
-];
-
 // Your task:
-// Create a 'filterProducts' function that:
-// 1. Filters by price range (minPrice, maxPrice)
-// 2. Filters by minimum rating
-// 3. Filters by stock availability (inStock: true/false)
-// 4. Filters by category
-// 5. Combines multiple filters using logical operators
+const filterProducts = (products, filters) => {
+    return products.filter((p) => {
+        let match = true;
 
-// Challenge: Create an advanced filter that:
-// - Takes a filter object: { price: [min, max], rating: min, inStock: boolean, category: string }
-// - Applies all matching filters
-// - Uses comparison operators efficiently
-// - Returns filtered and sorted results
+        if (filters.price) {
+            const [min, max] = filters.price;
+            match = match && p.price >= min && p.price <= max;
+        }
+        if (filters.rating) {
+            match = match && p.rating >= filters.rating;
+        }
+        if (filters.inStock !== undefined) {
+            match = match && (filters.inStock ? p.stock > 0 : p.stock === 0);
+        }
+        if (filters.category) {
+            match = match && p.category === filters.category;
+        }
+
+        return match;
+    });
+};
+
+// Challenge: advanced filter + sorting
+const advancedFilterProducts = (products, filters) => {
+    let results = filterProducts(products, filters);
+
+    results = results.sort((a, b) => a.price - b.price);
+
+    return results;
+};
 
 // ============================================================================
 // Problem 3: Building a Priority Queue
 // Use comparisons to prioritize items
 // ============================================================================
 
-// Your task:
-// Create a 'PriorityQueue' class that:
-// 1. Stores items with priority (number, higher = more important)
-// 2. addItem(item, priority) - adds item with priority
-// 3. getHighestPriority() - returns item with highest priority
-// 4. removeHighest() - removes and returns highest priority item
-// 5. Uses comparison operators to maintain order
+class PriorityQueue {
+    constructor() {
+        this.queue = [];
+    }
 
-// Challenge: Enhance it to:
-// - Support priority ties (use secondary comparison like timestamp)
-// - Have methods: isEmpty(), size(), peek()
-// - Handle edge cases (empty queue, single item, etc.)
-// - Use efficient comparison-based sorting
+    addItem(item, priority) {
+        const entry = { item, priority, time: Date.now() };
+        this.queue.push(entry);
+
+        // sort by priority desc, then by earliest timestamp
+        this.queue.sort((a, b) => {
+            if (a.priority === b.priority) return a.time - b.time;
+            return b.priority - a.priority;
+        });
+    }
+
+    getHighestPriority() {
+        return this.queue.length > 0 ? this.queue[0].item : null;
+    }
+
+    removeHighest() {
+        return this.queue.shift()?.item || null;
+    }
+
+    isEmpty() {
+        return this.queue.length === 0;
+    }
+
+    size() {
+        return this.queue.length;
+    }
+
+    peek() {
+        return this.queue.length > 0 ? this.queue[0] : null;
+    }
+}
 
 // ============================================================================
 // Problem 4: Complete Comparison Challenge
 // Build a comprehensive comparison-based application
 // ============================================================================
 
-const students = [
-    { name: "Alice", grades: [85, 90, 88], age: 20, attendance: 95 },
-    { name: "Bob", grades: [92, 88, 90], age: 19, attendance: 98 },
-    { name: "Charlie", grades: [78, 82, 80], age: 21, attendance: 87 },
-    { name: "Diana", grades: [95, 92, 94], age: 20, attendance: 100 }
-];
+const StudentAnalyzer = {
+    calculateAverage: (grades) =>
+        grades.reduce((a, b) => a + b, 0) / grades.length,
 
-// Your task:
-// Create a comprehensive 'StudentAnalyzer' system with:
+    isPassing: (student, passingGrade) =>
+        StudentAnalyzer.calculateAverage(student.grades) >= passingGrade,
 
-// 1. calculateAverage(grades) - calculates average grade
-// 2. isPassing(student, passingGrade) - checks if average >= passingGrade
-// 3. hasGoodAttendance(student, threshold) - checks attendance >= threshold
-// 4. compareStudents(a, b) - compares by average grade
-// 5. getTopPerformers(students, count) - returns top N students
-// 6. getStudentsByCriteria(students, criteria) - filters by multiple criteria
+    hasGoodAttendance: (student, threshold) =>
+        student.attendance >= threshold,
 
-// Challenge: Create a 'generateReport' function that:
-// - Analyzes all students
-// - Uses multiple comparison operations
-// - Returns a report with:
-//   - Students passing (grade >= 70 AND attendance >= 90)
-//   - Students at risk (grade < 70 OR attendance < 90)
-//   - Top 3 performers
-//   - Average class performance
-//   - Statistics by age group
-// - All using comparison and logical operators effectively
+    compareStudents: (a, b) =>
+        StudentAnalyzer.calculateAverage(b.grades) -
+        StudentAnalyzer.calculateAverage(a.grades),
 
+    getTopPerformers: (students, count) =>
+        [...students]
+            .sort(StudentAnalyzer.compareStudents)
+            .slice(0, count),
+
+    getStudentsByCriteria: (students, criteria) =>
+        students.filter((s) => {
+            let match = true;
+
+            if (criteria.minAvg !== undefined) {
+                match =
+                    match &&
+                    StudentAnalyzer.calculateAverage(s.grades) >=
+                        criteria.minAvg;
+            }
+            if (criteria.minAttendance !== undefined) {
+                match = match && s.attendance >= criteria.minAttendance;
+            }
+            if (criteria.maxAge !== undefined) {
+                match = match && s.age <= criteria.maxAge;
+            }
+
+            return match;
+        }),
+};
+
+// Challenge: generateReport
+const generateReport = (students) => {
+    const averages = students.map((s) =>
+        StudentAnalyzer.calculateAverage(s.grades)
+    );
+    const classAvg =
+        averages.reduce((a, b) => a + b, 0) / averages.length;
+
+    const top3 = StudentAnalyzer.getTopPerformers(students, 3);
+
+    const passing = students.filter(
+        (s) =>
+            StudentAnalyzer.calculateAverage(s.grades) >= 70 &&
+            s.attendance >= 90
+    );
+
+    const atRisk = students.filter(
+        (s) =>
+            StudentAnalyzer.calculateAverage(s.grades) < 70 ||
+            s.attendance < 90
+    );
+
+    const byAge = {};
+    for (const s of students) {
+        if (!byAge[s.age]) byAge[s.age] = [];
+        byAge[s.age].push(s);
+    }
+
+    return {
+        passingStudents: passing,
+        atRiskStudents: atRisk,
+        topPerformers: top3,
+        classAverage: classAvg,
+        groupedByAge: byAge,
+    };
+};
